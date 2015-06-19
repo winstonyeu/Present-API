@@ -6,7 +6,6 @@ A Python 3 client for Present API
 
 **Authenticatication**
 --------------------------
----------------------------------------------------------
 **Authenticating a user**
 
 Logging in to retrieve and sets the access token
@@ -20,7 +19,6 @@ api.loginUser("email", "password")
 
 **Data Retrieval**
 --------------------------
-------------------------------------
 Account:
 ```
 api.loginUser("email", "password")
@@ -49,7 +47,6 @@ api.unfollowUser(user_id)
 
 **Error Handling**
 --------------------------
-------------------------------------
  ```python
  from PresentAPI import PresentAPIError
 
