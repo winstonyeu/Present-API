@@ -1,2 +1,2 @@
-# PresentAPI
-REST API for Present
+# python-present
+A Python 3 client for Present API
