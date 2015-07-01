@@ -4,8 +4,8 @@ import re, os.path
 import base64
 
 class PresentAPI:
-    url = 'http://jr2.presentapp.co:8000'
-    #url = 'https://private-api.presentapp.co'
+    #url = 'http://jr2.presentapp.co:8000'
+    url = 'https://private-api.presentapp.co'
     
     def __init__(self):
         self.accesstoken = ""
@@ -43,7 +43,6 @@ class PresentAPI:
                   }
         headers = {'Content-Type': 'application/json'}
         r = requests.post(registerurl, data=json.dumps(payload), headers=headers)
-        print(r.text)
         if r.status_code == 422:
             return False
         return True
@@ -56,10 +55,9 @@ class PresentAPI:
         return r
         
     def getUser(self, email):
-        userurl = self.url + "/users/_search?q=%s&page=1" % email
+        userurl = self.url + "/users/_search?q=%s" % email
         headers = {'X-Accesstoken': self.accesstoken}
         r = requests.get(userurl, headers=headers)
-        print(r.text)
         r = r.json()
         return r[0]
     
@@ -89,7 +87,7 @@ class PresentAPI:
         followurl = self.url + "/users/me/follow/%s" % userid
         headers = {'X-Accesstoken': self.accesstoken}
         r = requests.put(followurl, headers=headers)
-        print(r.text)
+        #print(r.text)
         
     def unfollowUser(self, userid):
         followurl = self.url + "/users/me/follow/%s" % userid
@@ -115,37 +113,36 @@ class PresentAPI:
         requests.put(upurl, data=payload, headers=headers)
         
     def changeDisplayPicture(self, dp):
-        dpurl = self.url + "/users/me/dp"
-#         with open(dp, "rb") as image_file:
-#             encoded_image = base64.b64encode(image_file.read())
-        
-        #print(encoded_image)
-           
-        payload = {
-                    'dp': open(dp, "rb")
-                  }
-        
-#         payload = {
-#                     'dp': dp
-#                   }
+        dpurl = self.url + "/users/me/dp"       
+        file = open(dp+".jpg", 'rb')
+        files = {'dp': file}
 
-        headers = {'Content-Type': 'application/x-www-form-urlencoded', 'charset': 'UTF-8', 'X-Accesstoken': self.accesstoken}
-        r = requests.put(dpurl, data=payload, headers=headers)
-        print(r.text)
+        headers = {'X-Accesstoken': self.accesstoken}
+        requests.put(dpurl, files = files, headers=headers)
         
-    def saveImage(self, user):
-        filename = "dp/%s.jpg" % user['firstname']
-        if not os.path.exists("dp"):
-            os.makedirs("dp")
-        if os.path.isfile(filename) == True:
-            print("Image %s already exist" % filename)
-            return 0
+    def likePresent(self, presentid):
+        lpurl = self.url + "presents/%s/like" + presentid
         
-        r = requests.get(user['picture'])
-        with open(filename, "wb") as f:
-            f.write(r.content)
-        print("Done saving image")
+        headers = {'X-Accesstoken': self.accesstoken}
         
+        requests.post(lpurl, headers=headers)
+        
+    def unlikePresent(self, presentid):
+        lpurl = self.url + "presents/%s/like" + presentid
+        
+        headers = {'X-Accesstoken': self.accesstoken}
+        
+        requests.delete(lpurl, headers=headers)
+
+class PresentAPIError(Exception):
+    def __init__(self, status_code, error_type, error_message, *args, **kwargs):
+        self.status_code = status_code
+        self.error_type = error_type
+        self.error_message = error_message
+
+    def __str__(self):
+        return "(%s) %s-%s" % (self.status_code, self.error_type, self.error_message)
+    
         
         
         
